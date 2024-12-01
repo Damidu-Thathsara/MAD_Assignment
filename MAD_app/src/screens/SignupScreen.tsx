@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 
 // Regex patterns for password and email validation
@@ -24,51 +24,63 @@ const SignupScreen = ({ navigation }: any) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async () => {
-    // Reset errors
+    // Reset error states
     setUsernameError('');
     setEmailError('');
     setPasswordError('');
 
+    let hasError = false;
+
     // Basic validation
-    if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
-      Alert.alert('Error', 'All fields are required!');
-      return;
+    if (!username.trim()) {
+      setUsernameError('Username is required.');
+      hasError = true;
     }
 
-    // Username validation
-    if (username.length < 3) {
-      setUsernameError('Username must be at least 3 characters long.');
-      return;
-    }
-
-    // Email validation
-    if (!emailRegex.test(email)) {
+    if (!email.trim()) {
+      setEmailError('Email is required.');
+      hasError = true;
+    } else if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address.');
-      return;
+      hasError = true;
+    }
+
+    if (!password.trim()) {
+      setPasswordError('Password is required.');
+      hasError = true;
+    }
+
+    if (!confirmPassword.trim()) {
+      setPasswordError('Confirm password is required.');
+      hasError = true;
     }
 
     // Password match check
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match!');
-      return;
+      setPasswordError('Passwords do not match!');
+      hasError = true;
     }
 
     // Password strength validation
     if (!passwordConstraints.minLength.test(password)) {
       setPasswordError('Password must be at least 8 characters long.');
-      return;
+      hasError = true;
     } else if (!passwordConstraints.uppercase.test(password)) {
       setPasswordError('Password must contain at least one uppercase letter.');
-      return;
+      hasError = true;
     } else if (!passwordConstraints.lowercase.test(password)) {
       setPasswordError('Password must contain at least one lowercase letter.');
-      return;
+      hasError = true;
     } else if (!passwordConstraints.number.test(password)) {
       setPasswordError('Password must contain at least one number.');
-      return;
+      hasError = true;
     } else if (!passwordConstraints.specialChar.test(password)) {
       setPasswordError('Password must contain at least one special character.');
-      return;
+      hasError = true;
+    }
+
+    if (hasError) {
+      return; // Stop further execution if there are errors
     }
 
     setIsLoading(true);
@@ -177,10 +189,13 @@ const styles = StyleSheet.create({
     borderColor: 'red',
   },
   error: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 10,
-    marginLeft: 5,
+    color: '#D32F2F',          // Darker red for better contrast and visibility
+    fontSize: 16,              // Increased font size for better readability
+    fontWeight: '500',         // Medium weight for clarity
+    marginBottom: 8,          // Increase space below error
+    flexDirection: 'row',      // To accommodate an error icon with text
+    alignItems: 'center',      // Vertically center the icon with the text
+    paddingHorizontal: 10,     // Horizontal padding
   },
   button: {
     backgroundColor: '#007BFF',

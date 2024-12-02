@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, ImageBackground, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login } from '../store'; // Import your Redux action
 import axios from 'axios';
@@ -61,7 +61,7 @@ const LoginScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Welcome</Text>
 
             <TextInput
                 style={[styles.input, usernameError ? styles.inputError : null]}
@@ -94,6 +94,7 @@ const LoginScreen = ({ navigation }: any) => {
                 <Text style={styles.signupText}>Don't have an account? Sign up</Text>
             </TouchableOpacity>
         </View>
+
     );
 };
 

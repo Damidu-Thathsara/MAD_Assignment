@@ -41,7 +41,7 @@ const LoginScreen = ({ navigation }: any) => {
                         text: 'OK',
                         onPress: () => {
                             setTimeout(() => {
-                                navigation.navigate('Home'); // Navigate to HomeScreen after 2 seconds
+                                navigation.navigate('Home'); // Navigate to HomeScreen after 0.5 seconds
                             }, 500);
                         },
                     },

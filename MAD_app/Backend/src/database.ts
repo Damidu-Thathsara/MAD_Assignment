@@ -1,14 +1,20 @@
 import sqlite3 from "sqlite3";
-import { open } from "sqlite";
+import { open, Database } from "sqlite";
 
-const initDB = async () => {
+let db: Database | null = null; // Singleton instance
+
+export const initDB = async () => {
+  if (db) {
+    // Return the existing database instance
+    return db;
+  }
+
   try {
-    const db = await open({
+    db = await open({
       filename: "./data.db",
       driver: sqlite3.Database,
     });
 
-    // Create the users table if it doesn't exist, with a username field
     await db.exec(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,5 +31,3 @@ const initDB = async () => {
     throw error;
   }
 };
-
-export default initDB;

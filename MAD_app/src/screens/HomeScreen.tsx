@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, StyleSheet, ImageBackground, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    ActivityIndicator,
+    FlatList,
+    TouchableOpacity,
+    StyleSheet,
+    ImageBackground,
+    Animated,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, RootState } from '../store';
 import { BalldontlieAPI } from "@balldontlie/sdk";
@@ -32,6 +41,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     const [teams, setTeams] = useState<Team[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [clickCount, setClickCount] = useState(0);
+    const scaleAnimation = useState(new Animated.Value(1))[0];
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -50,10 +60,30 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         fetchTeams();
     }, []);
 
+    const animateButton = () => {
+        Animated.sequence([
+            Animated.timing(scaleAnimation, {
+                toValue: 1.8,
+                duration: 300,
+                useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnimation, {
+                toValue: 1,
+                duration: 150,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    };
+
+    const handleCardClick = () => {
+        setClickCount(clickCount + 1);
+        animateButton();
+    };
+
     if (loading) {
         return (
             <View style={styles.centeredContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
+                <ActivityIndicator size="large" color="#6A1B9A" />
                 <Text style={styles.loadingText}>Loading teams...</Text>
             </View>
         );
@@ -75,19 +105,9 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         );
     }
 
-    const handleCardClick = () => {
-        setClickCount(clickCount + 1);
-    };
-
-
     return (
         <View style={styles.container}>
-            <View style={styles.topBar}>
-                <Text style={styles.usernameText}>Hello, {username}!</Text>
-                
-            </View>
-
-            <Text style={styles.headerText}>NBA Teams</Text>
+            <Text style={styles.headerText}>DunkView</Text>
             <FlatList
                 data={teams}
                 keyExtractor={(item) => item.id.toString()}
@@ -112,9 +132,9 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     </TouchableOpacity>
                 )}
             />
-            <View style={styles.floatingButtonContainer}>
-                <Text style={styles.floatingButtonText}>{clickCount} item clicks</Text>
-            </View>
+            <Animated.View style={[styles.floatingButtonContainer, { transform: [{ scale: scaleAnimation }] }]}>
+                <Text style={styles.floatingButtonText}>{clickCount}</Text>
+            </Animated.View>
         </View>
     );
 };
@@ -123,35 +143,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f9f9f9',
-    },
-    topBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    usernameText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    logoutButton: {
-        backgroundColor: '#FF3B30',
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-    },
-    logoutButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
+        backgroundColor: '#E1BEE7',
+        height: '100%',
     },
     headerText: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#333',
+        color: '#4A148C',
         textAlign: 'center',
     },
     centeredContainer: {
@@ -162,20 +161,19 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 10,
         fontSize: 16,
-        color: '#555',
+        color: '#4A148C',
     },
     errorText: {
         fontSize: 18,
-        color: 'red',
+        color: '#E53935',
     },
     noDataText: {
         fontSize: 18,
-        color: '#666',
+        color: '#616161',
     },
     card: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 15,
-        padding: 0,
         marginBottom: 15,
         elevation: 5,
         shadowColor: '#000',
@@ -191,27 +189,27 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         padding: 10,
     },
     teamName: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#FFF',
         marginBottom: 5,
     },
     teamDetails: {
         fontSize: 16,
-        color: '#ddd',
+        color: '#E0E0E0',
     },
     floatingButtonContainer: {
         position: 'absolute',
         bottom: 20,
         right: 20,
-        backgroundColor: '#007AFF',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 50,
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#6A1B9A',
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 5,
@@ -221,11 +219,10 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     floatingButtonText: {
-        color: '#ffffff',
-        fontSize: 16,
+        color: '#FFFFFF',
+        fontSize: 24,
         fontWeight: 'bold',
     },
 });
 
 export default HomeScreen;
-

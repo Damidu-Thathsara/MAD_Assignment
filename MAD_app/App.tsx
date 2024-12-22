@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { Button, Text, View, StyleSheet } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { Button, Text, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import store from './src/store'; // Make sure this path is correct
 import LoginScreen from './src/screens/LoginScreen';
@@ -14,19 +14,35 @@ const Stack = createStackNavigator();
 // Logout button component
 function LogoutButton() {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: () => {
+            dispatch(logout());
+            navigation.navigate('Login' as never);
+          },
+        },
+      ],
+    );
+  };
 
   return (
-    <Button
-      // Add onPress event handler to dispatch the logout action THEN navigate to the Login screen
-      onPress={() => {
-        dispatch(logout());
-      }
-      }
-      title="Logout"
-      color="#f44336"
-    />
+    <TouchableOpacity style={styles.button} onPress={handleLogout}>
+      <Text style={styles.text}>Logout</Text>
+    </TouchableOpacity>
   );
 }
+
 
 // Welcome message component
 function WelcomeMessage() {
@@ -46,12 +62,18 @@ function App() {
         <Stack.Navigator
           initialRouteName="Login"
           screenOptions={{
-            headerTitle: '',
+            headerTitle: "",
+            headerStyle: {
+              backgroundColor: '#6A1B9A',
+            },
           }}
         >
           <Stack.Screen name="Login" component={LoginScreen} options={{
+            headerLeft: () => null,
           }} />
-          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} options={{
+            headerLeft: () => null,
+          }} />
           <Stack.Screen
             name="Home"
             component={HomeScreen}
@@ -72,9 +94,21 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   welcomeText: {
-    color: '#fff',
+    color: '#E1BEE7',
     fontSize: 22,
     fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: '#E1BEE7',
+    padding: 8, // Adjust the padding as needed
+    borderRadius: 8, // Optional for rounded corners
+    alignItems: 'center',// Center text horizontally
+    margin: 10, // Optional for margin
+  },
+  text: {
+    color: '#6A1B9A', // Text color
+    fontWeight: 'bold', // Optional for bold text
+    fontSize: 20, // Font size
   },
 });
 

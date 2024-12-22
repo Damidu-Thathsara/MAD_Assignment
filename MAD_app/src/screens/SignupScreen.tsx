@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import axios from 'axios';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Regex patterns for password and email validation
 const passwordConstraints = {
@@ -21,66 +22,39 @@ const SignupScreen = ({ navigation }: any) => {
   const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSignup = async () => {
-    // Reset error states
     setUsernameError('');
     setEmailError('');
     setPasswordError('');
+    setConfirmPasswordError('');
 
-    let hasError = false;
-
-    // Basic validation
-    if (!username.trim()) {
+    if (username.trim() === '') {
       setUsernameError('Username is required.');
-      hasError = true;
+      return;
     }
 
-    if (!email.trim()) {
-      setEmailError('Email is required.');
-      hasError = true;
-    } else if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address.');
-      hasError = true;
+    if (!emailRegex.test(email)) {
+      setEmailError('Invalid email address.');
+      return;
     }
 
-    if (!password.trim()) {
-      setPasswordError('Password is required.');
-      hasError = true;
+    if (!passwordConstraints.minLength.test(password) ||
+      !passwordConstraints.uppercase.test(password) ||
+      !passwordConstraints.lowercase.test(password) ||
+      !passwordConstraints.number.test(password) ||
+      !passwordConstraints.specialChar.test(password)) {
+      setPasswordError('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.');
+      return;
     }
 
-    if (!confirmPassword.trim()) {
-      setPasswordError('Confirm password is required.');
-      hasError = true;
-    }
-
-    // Password match check
     if (password !== confirmPassword) {
-      setPasswordError('Passwords do not match!');
-      hasError = true;
-    }
-
-    // Password strength validation
-    if (!passwordConstraints.minLength.test(password)) {
-      setPasswordError('Password must be at least 8 characters long.');
-      hasError = true;
-    } else if (!passwordConstraints.uppercase.test(password)) {
-      setPasswordError('Password must contain at least one uppercase letter.');
-      hasError = true;
-    } else if (!passwordConstraints.lowercase.test(password)) {
-      setPasswordError('Password must contain at least one lowercase letter.');
-      hasError = true;
-    } else if (!passwordConstraints.number.test(password)) {
-      setPasswordError('Password must contain at least one number.');
-      hasError = true;
-    } else if (!passwordConstraints.specialChar.test(password)) {
-      setPasswordError('Password must contain at least one special character.');
-      hasError = true;
-    }
-
-    if (hasError) {
-      return; // Stop further execution if there are errors
+      setConfirmPasswordError('Passwords do not match.');
+      return;
     }
 
     setIsLoading(true);
@@ -92,14 +66,23 @@ const SignupScreen = ({ navigation }: any) => {
         password,
       });
 
-      Alert.alert('Success', response.data.message);
-      navigation.navigate('Login');
-
+      if (response.status === 201) {
+        Alert.alert('Success', 'Account created successfully!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setTimeout(() => {
+                navigation.navigate('Login');
+              }, 500);
+            },
+          },
+        ]);
+      }
     } catch (error: any) {
       if (error.response) {
-        Alert.alert('Error', error.response.data.message);
+        setUsernameError('Username or email already exists.');
       } else {
-        Alert.alert('Error', 'Unable to connect to the server.');
+        setUsernameError('Unable to connect to the server.');
       }
     } finally {
       setIsLoading(false);
@@ -107,55 +90,87 @@ const SignupScreen = ({ navigation }: any) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Create an Account</Text>
+    <ScrollView contentContainerStyle={styles.background}>
+      <View style={styles.overlay}>
+        <Image source={require('../../assets/image.png')} style={styles.logo} />
+        <Text style={styles.title}>Create an Account</Text>
 
-      <TextInput
-        style={[styles.input, usernameError ? styles.inputError : null]}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      {usernameError && <Text style={styles.error}>{usernameError}</Text>}
+        <View style={styles.inputContainer}>
+          <Icon name="person" size={24} color="#888" style={styles.icon} />
+          <TextInput
+            style={[styles.input, usernameError ? styles.inputError : null]}
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+            placeholderTextColor="#888"
+          />
+        </View>
+        {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
 
-      <TextInput
-        style={[styles.input, emailError ? styles.inputError : null]}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      {emailError && <Text style={styles.error}>{emailError}</Text>}
+        <View style={styles.inputContainer}>
+          <Icon name="email" size={24} color="#888" style={styles.icon} />
+          <TextInput
+            style={[styles.input, emailError ? styles.inputError : null]}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor="#888"
+          />
+        </View>
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-      <TextInput
-        style={[styles.input, passwordError ? styles.inputError : null]}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {passwordError && <Text style={styles.error}>{passwordError}</Text>}
+        <View style={styles.inputContainer}>
+          <Icon name="lock" size={24} color="#888" style={styles.icon} />
+          <TextInput
+            style={[styles.input, passwordError ? styles.inputError : null]}
+            placeholder="Password"
+            value={password}
+            secureTextEntry={!showPassword}
+            onChangeText={setPassword}
+            placeholderTextColor="#888"
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'visibility' : 'visibility-off'}
+              size={24}
+              color="#888"
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        </View>
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+        <View style={styles.inputContainer}>
+          <Icon name="lock" size={24} color="#888" style={styles.icon} />
+          <TextInput
+            style={[styles.input, confirmPasswordError ? styles.inputError : null]}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholderTextColor="#888"
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Icon
+              name={showConfirmPassword ? 'visibility' : 'visibility-off'}
+              size={24}
+              color="#888"
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        </View>
+        {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#007BFF" style={styles.loadingIndicator} />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-      )}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#6A1B9A" style={styles.loader} />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSignup}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        )}
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Already have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.link}>Login</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.signupLink}>
+          <Text style={styles.signupText}>Already have an account? Log in</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -163,68 +178,82 @@ const SignupScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
+    flexGrow: 1,
+    backgroundColor: '#E1BEE7',
+  },
+  overlay: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
+    padding: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginBottom: 40,
     textAlign: 'center',
-    color: '#333',
+    color: '#4A148C',
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 25,
+    paddingHorizontal: 15,
     backgroundColor: '#fff',
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    height: 50,
     fontSize: 16,
+    paddingHorizontal: 10,
   },
-  inputError: {
-    borderColor: 'red',
+  icon: {
+    marginRight: 10,
   },
-  error: {
-    color: '#D32F2F',          // Darker red for better contrast and visibility
-    fontSize: 16,              // Increased font size for better readability
-    fontWeight: '500',         // Medium weight for clarity
-    marginBottom: 8,          // Increase space below error
-    flexDirection: 'row',      // To accommodate an error icon with text
-    alignItems: 'center',      // Vertically center the icon with the text
-    paddingHorizontal: 10,     // Horizontal padding
+  loader: {
+    marginVertical: 20,
   },
   button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: '#6A1B9A',
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginBottom: 20,
     alignItems: 'center',
-    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  loadingIndicator: {
-    marginVertical: 20,
+  inputError: {
+    borderColor: 'red',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 5,
+  errorText: {
+    color: '#D32F2F',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
   },
-  footerText: {
+  signupLink: {
+    alignItems: 'center',
+  },
+  signupText: {
+    color: '#6A1B9A',
     fontSize: 16,
-    color: '#333',
-  },
-  link: {
-    color: '#007BFF',
     fontWeight: 'bold',
-    marginLeft: 5,
   },
 });
 

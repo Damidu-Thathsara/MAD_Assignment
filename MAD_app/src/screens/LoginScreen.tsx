@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { login } from '../store'; // Import your Redux action
+import { login } from '../store'; 
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 

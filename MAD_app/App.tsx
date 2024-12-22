@@ -100,15 +100,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#E1BEE7',
-    padding: 8, // Adjust the padding as needed
-    borderRadius: 8, // Optional for rounded corners
-    alignItems: 'center',// Center text horizontally
-    margin: 10, // Optional for margin
+    padding: 8, 
+    borderRadius: 8, 
+    alignItems: 'center',
+    margin: 10, 
   },
   text: {
-    color: '#6A1B9A', // Text color
-    fontWeight: 'bold', // Optional for bold text
-    fontSize: 20, // Font size
+    color: '#6A1B9A', 
+    fontWeight: 'bold', 
+    fontSize: 20,
   },
 });
 

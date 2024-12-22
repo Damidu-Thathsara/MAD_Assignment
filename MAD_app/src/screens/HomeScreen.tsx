@@ -10,7 +10,7 @@ import {
     Animated,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout, RootState } from '../store';
+import {  RootState } from '../store';
 import { BalldontlieAPI } from "@balldontlie/sdk";
 
 interface Team {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import { View, ScrollView, Text, TextInput, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { login } from '../store'; 
+import { login } from '../store';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -62,10 +62,14 @@ const LoginScreen = ({ navigation }: any) => {
     };
 
     return (
-        <View style={styles.background}>
-            <View style={styles.overlay}>
+        <KeyboardAvoidingView
+            style={styles.background}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Image source={require('../../assets/image.png')} style={styles.logo} />
-                <Text style={styles.title}>Welcome!</Text>
+                <Text style={styles.title}>Welcome</Text>
+                <Text style={styles.subtitle}>Please log in to your account.</Text>
 
                 <View style={styles.inputContainer}>
                     <Icon name="person" size={24} color="#888" style={styles.icon} />
@@ -111,8 +115,9 @@ const LoginScreen = ({ navigation }: any) => {
                 <TouchableOpacity onPress={() => navigation.navigate('Signup')} style={styles.signupLink}>
                     <Text style={styles.signupText}>Don't have an account? Sign up</Text>
                 </TouchableOpacity>
-            </View>
-        </View>
+
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -121,10 +126,11 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#E1BEE7',
     },
-    overlay: {
+    scrollContent: {
         flex: 1,
         justifyContent: 'center',
-        padding: 20,
+        paddingHorizontal: 10,
+        marginBottom: 80,
     },
     logo: {
         width: 100,
@@ -135,9 +141,15 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 40,
+        marginBottom: 5,
         textAlign: 'center',
-        color: '#4A148C',
+        color: '#6A1B9A',
+    },
+    subtitle: {
+        fontSize: 19,
+        color: '#6A1B9A',
+        textAlign: 'center',
+        marginBottom: 20,
     },
     inputContainer: {
         flexDirection: 'row',

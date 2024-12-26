@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, Alert, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -89,11 +89,14 @@ const SignupScreen = ({ navigation }: any) => {
     }
   };
 
+
   return (
-    <ScrollView contentContainerStyle={styles.background}>
-      <View style={styles.overlay}>
+    <KeyboardAvoidingView style={styles.background} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" >
         <Image source={require('../../assets/image.png')} style={styles.logo} />
-        <Text style={styles.title}>Create an Account</Text>
+        <Text style={styles.title}>Get Started</Text>
+        <Text style={styles.subtitle}>Create your account to begin.</Text>
+
 
         <View style={styles.inputContainer}>
           <Icon name="person" size={24} color="#888" style={styles.icon} />
@@ -172,20 +175,24 @@ const SignupScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.signupLink}>
           <Text style={styles.signupText}>Already have an account? Log in</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   background: {
-    flexGrow: 1,
-    backgroundColor: '#F3E5F5',
+    flex: 1,
+    backgroundColor: '#E1BEE7',
   },
-  overlay: {
+  scrollContent: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 10,
+    marginBottom: 50,
+  },
+  overlay: {
+    paddingHorizontal: 10,
   },
   logo: {
     width: 100,
@@ -196,9 +203,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 40,
+    marginBottom: 5,
     textAlign: 'center',
-    color: '#4A148C',
+    color: '#6A1B9A',
+  },
+  subtitle: {
+    fontSize: 19,
+    color: '#6A1B9A',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -223,7 +236,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   button: {
-    backgroundColor: '#8E24AA',
+    backgroundColor: '#6A1B9A',
     paddingVertical: 12,
     borderRadius: 25,
     marginBottom: 20,

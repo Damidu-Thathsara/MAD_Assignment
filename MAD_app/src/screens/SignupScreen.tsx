@@ -60,7 +60,7 @@ const SignupScreen = ({ navigation }: any) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://10.0.2.2:5000/api/signup', {
+      const response = await axios.post('http://192.168.1.7:5000/api/signup', {
         username,
         email,
         password,
@@ -180,7 +180,7 @@ const SignupScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   background: {
     flexGrow: 1,
-    backgroundColor: '#E1BEE7',
+    backgroundColor: '#F3E5F5',
   },
   overlay: {
     flex: 1,
@@ -223,15 +223,12 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   button: {
-    backgroundColor: '#6A1B9A',
+    backgroundColor: '#8E24AA',
     paddingVertical: 12,
     borderRadius: 25,
     marginBottom: 20,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   buttonText: {
     color: '#fff',

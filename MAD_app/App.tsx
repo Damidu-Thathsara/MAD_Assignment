@@ -8,6 +8,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SignupScreen from './src/screens/SignupScreen';
 import { logout } from './src/store';
+import { RootState } from './src/store';
 
 const Stack = createStackNavigator();
 
@@ -46,7 +47,8 @@ function LogoutButton() {
 
 // Welcome message component
 function WelcomeMessage() {
-  const username = useSelector((state: { user: { username: string } }) => state.user.username);
+  const username = useSelector((state: RootState) => state.user.username);
+  console.log('Current username:', username); // Debug line
 
   return (
     <View style={styles.welcomeContainer}>
@@ -62,7 +64,6 @@ function App() {
         <Stack.Navigator
           initialRouteName="Login"
           screenOptions={{
-            headerTitle: "",
             headerStyle: {
               backgroundColor: '#6A1B9A',
             },
@@ -70,9 +71,11 @@ function App() {
         >
           <Stack.Screen name="Login" component={LoginScreen} options={{
             headerLeft: () => null,
+            headerTitle: "",
           }} />
           <Stack.Screen name="Signup" component={SignupScreen} options={{
             headerLeft: () => null,
+            headerTitle: "",
           }} />
           <Stack.Screen
             name="Home"
@@ -80,6 +83,7 @@ function App() {
             options={{
               headerLeft: () => <WelcomeMessage />, // Welcome message
               headerRight: () => <LogoutButton />, // Logout button
+              headerTitle: "",
             }}
           />
         </Stack.Navigator>
@@ -92,22 +96,28 @@ function App() {
 const styles = StyleSheet.create({
   welcomeContainer: {
     marginLeft: 20,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
   },
   welcomeText: {
     color: '#E1BEE7',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   button: {
     backgroundColor: '#E1BEE7',
-    padding: 8, 
-    borderRadius: 8, 
+    width: "50%",
+    height: "80%",
+    padding: 5,
+    borderRadius: 8,
     alignItems: 'center',
-    margin: 10, 
+    justifyContent: 'center',
+    margin: 10,
   },
   text: {
-    color: '#6A1B9A', 
-    fontWeight: 'bold', 
+    color: '#6A1B9A',
+    fontWeight: 'bold',
     fontSize: 20,
   },
 });
